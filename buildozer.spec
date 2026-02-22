@@ -1,11 +1,13 @@
 [app]
 title = Yulin Campus
 package.name = yulin_campus
-package.version = 1.0.0
+version = 1.0.0
 description = 榆林学院智慧校园助手
 author = Matrix Agent
 email = support@yulincampus.com
 license = MIT
+source.dir = .
+source.include_exts = py,png,jpg,kv,atlas
 requirements = python3,kivy==2.3.0,requests,beautifulsoup4,plyer,networkx,pillow,python-dateutil
 orientation = portrait
 

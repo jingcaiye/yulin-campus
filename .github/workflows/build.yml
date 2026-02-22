@@ -16,61 +16,49 @@ jobs:
         with:
           python-version: '3.9'
       
-      - name: Install system dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk wget unzip
+          sudo apt-get install -y openjdk-17-jdk
       
-      - name: Set JAVA_HOME
-        run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-          echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
-          echo "PATH=/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-levels: "27"
       
-      - name: Download Android SDK command line tools
+      - name: Install Python packages
         run: |
-          mkdir -p /opt/android-sdk/cmdline-tools
-          cd /opt/android-sdk/cmdline-tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          unzip -q cmdline-tools.zip
-          rm cmdline-tools.zip
+          pip install buildozer==1.5.0
+          pip install kivy==2.3.0
+          pip install cython==0.29.36
       
-      - name: Rename SDK tools directory
+      - name: Prepare environment
         run: |
-          mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.9-9/x64" >> $GITHUB_ENV
+          mkdir -p $ANDROID_HOME/build-tools
+          cd $ANDROID_HOME/build-tools
+          wget -q https://dl.google.com/android/repository/build-tools_r33.2-linux.zip -O build-tools.zip
+          unzip -q build-tools.zip
+          rm build-tools.zip
+          mv android-13 33.0.2
       
-      - name: Accept licenses
+      - name: Verify aidl
         run: |
-          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
-      
-      - name: Install SDK components
-        run: |
-          /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-27" "build-tools;33.0.2" "platform-tools"
-      
-      - name: Verify aidl exists
-        run: |
-          ls -la /opt/android-sdk/build-tools/33.0.2/aidl
-          which aidl
+          ls -la $ANDROID_HOME/build-tools/33.0.2/aidl*
+          chmod +x $ANDROID_HOME/build-tools/33.0.2/aidl*
       
       - name: Create local.properties
         run: |
-          echo "sdk.dir=/opt/android-sdk" > $GITHUB_WORKSPACE/local.properties
-          echo "ndk.dir=" >> $GITHUB_WORKSPACE/local.properties
-          cat $GITHUB_WORKSPACE/local.properties
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
       
-      - name: Install Python dependencies
-        run: |
-          pip install buildozer==1.5.0 kivy==2.3.0 cython
-      
-      - name: Build debug APK
-        working-directory: $GITHUB_WORKSPACE
+      - name: Build APK
         run: |
           buildozer android debug
-      
+        
       - name: Upload APK
         uses: actions/upload-artifact@v4
-        if: success()
         with:
           name: yulin-campus-apk
           path: bin/*.apk

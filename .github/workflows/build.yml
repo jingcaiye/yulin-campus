@@ -9,56 +9,82 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
       
-      - name: Install dependencies
+      - name: Install system packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk
+          sudo apt-get install -y openjdk-17-jdk wget unzip
       
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-levels: "27"
-      
-      - name: Install Python packages
+      - name: Set environment variables
         run: |
-          pip install buildozer==1.5.0
-          pip install kivy==2.3.0
-          pip install cython==0.29.36
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+          echo "ANDROID_HOME=/home/runner/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
       
-      - name: Prepare environment
+      - name: Download Android command line tools
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.9-9/x64" >> $GITHUB_ENV
-          mkdir -p $ANDROID_HOME/build-tools
-          cd $ANDROID_HOME/build-tools
-          wget -q https://dl.google.com/android/repository/build-tools_r33.2-linux.zip -O build-tools.zip
-          unzip -q build-tools.zip
-          rm build-tools.zip
-          mv android-13 33.0.2
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          cd $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip
+          mv cmdline-tools latest
+          rm cmdline-tools.zip
       
-      - name: Verify aidl
+      - name: Accept licenses and install SDK packages
         run: |
-          ls -la $ANDROID_HOME/build-tools/33.0.2/aidl*
-          chmod +x $ANDROID_HOME/build-tools/33.0.2/aidl*
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-27" "build-tools;33.0.2"
+      
+      - name: Verify SDK installation
+        run: |
+          echo "=== SDK目录结构 ==="
+          ls -la $ANDROID_HOME/
+          echo ""
+          echo "=== build-tools ==="
+          ls -la $ANDROID_HOME/build-tools/
+          echo ""
+          echo "=== build-tools 33.0.2 ==="
+          ls -la $ANDROID_HOME/build-tools/33.0.2/
+          echo ""
+          echo "=== aidl文件 ==="
+          ls -la $ANDROID_HOME/build-tools/33.0.2/aidl
+          echo ""
+          echo "=== aidl权限 ==="
+          chmod 755 $ANDROID_HOME/build-tools/33.0.2/aidl
+          ls -la $ANDROID_HOME/build-tools/33.0.2/aidl
       
       - name: Create local.properties
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
+          cat local.properties
       
-      - name: Build APK
+      - name: Install Python packages
         run: |
+          pip install buildozer==1.5.0 kivy==2.3.0 cython==0.29.36
+      
+      - name: Build debug APK
+        run: |
+          export ANDROID_HOME=/home/runner/android-sdk
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          echo "=== 实际环境变量 ==="
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "PATH中的aidl位置:"
+          which aidl || find $ANDROID_HOME -name "aidl" -type f
+          echo ""
+          echo "=== 开始构建 ==="
           buildozer android debug
-        
+      
       - name: Upload APK
         uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: yulin-campus-apk
           path: bin/*.apk

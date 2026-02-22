@@ -25,45 +25,31 @@ jobs:
       - name: Set environment variables
         run: |
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-          echo "ANDROID_HOME=/home/runner/android-sdk" >> $GITHUB_ENV
-          echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
+          echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
       
       - name: Download Android command line tools
         run: |
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          cd $ANDROID_HOME/cmdline-tools
+          mkdir -p /opt/android-sdk/cmdline-tools
+          cd /opt/android-sdk/cmdline-tools
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
           unzip -q cmdline-tools.zip
           mv cmdline-tools latest
           rm cmdline-tools.zip
       
-      - name: Accept licenses and install SDK packages
+      - name: Accept licenses (CRITICAL - this fixes aidl issue)
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-27" "build-tools;33.0.2"
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-27" "build-tools;33.0.2" || true
       
-      - name: Verify SDK installation
+      - name: Clean buildozer cache (CRITICAL - prevents stale SDK references)
         run: |
-          echo "=== SDK目录结构 ==="
-          ls -la $ANDROID_HOME/
-          echo ""
-          echo "=== build-tools ==="
-          ls -la $ANDROID_HOME/build-tools/
-          echo ""
-          echo "=== build-tools 33.0.2 ==="
-          ls -la $ANDROID_HOME/build-tools/33.0.2/
-          echo ""
-          echo "=== aidl文件 ==="
-          ls -la $ANDROID_HOME/build-tools/33.0.2/aidl
-          echo ""
-          echo "=== aidl权限 ==="
-          chmod 755 $ANDROID_HOME/build-tools/33.0.2/aidl
-          ls -la $ANDROID_HOME/build-tools/33.0.2/aidl
+          rm -rf ~/.buildozer
+          rm -rf .buildozer
       
       - name: Create local.properties
         run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          cat local.properties
+          echo "sdk.dir=/opt/android-sdk" > local.properties
       
       - name: Install Python packages
         run: |
@@ -71,17 +57,22 @@ jobs:
       
       - name: Build debug APK
         run: |
-          export ANDROID_HOME=/home/runner/android-sdk
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          echo "=== 实际环境变量 ==="
+          export ANDROID_HOME=/opt/android-sdk
+          export ANDROID_SDK_ROOT=/opt/android-sdk
+          export PATH=/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:$JAVA_HOME/bin:$PATH
+          
+          # Verify environment
+          echo "=== Environment ==="
           echo "ANDROID_HOME=$ANDROID_HOME"
           echo "JAVA_HOME=$JAVA_HOME"
-          echo "PATH中的aidl位置:"
-          which aidl || find $ANDROID_HOME -name "aidl" -type f
-          echo ""
-          echo "=== 开始构建 ==="
-          buildozer android debug
-      
+          
+          # Clean any cached SDK
+          rm -rf ~/.buildozer/android/platform/
+          
+          # Build with verbose to see what's happening
+          buildozer android debug --verbose
+        
       - name: Upload APK
         uses: actions/upload-artifact@v4
         if: success()

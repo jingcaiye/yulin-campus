@@ -1,0 +1,11 @@
+# Yulin Smart Campus App
+# 榆林学院智慧校园助手
+
+Kivy==2.1.0
+KivyMD==1.1.1
+requests==2.28.1
+beautifulsoup4==4.11.1
+plyer==2.0.1
+networkx==2.8.8
+pandas==1.5.3
+pyinstaller==5.10.0

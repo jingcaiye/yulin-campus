@@ -1,0 +1,835 @@
+# 榆林学院智慧校园助手 - UI界面文件
+
+# 导入模块
+#:import os os
+
+# 颜色定义
+
+#:set THEME_COLOR '#A80000'
+#:set THEME_COLOR_LIGHT '#CC3333'
+#:set WHITE '#FFFFFF'
+#:set GRAY '#F5F5F5'
+#:set DARK_GRAY '#333333'
+#:set BLACK '#000000'
+
+# ==================== 根界面 ====================
+MyScreenManager:
+    LoginScreen:
+        name: 'login'
+    
+    MainScreen:
+        name: 'main'
+    
+    ScheduleScreen:
+        name: 'schedule'
+    
+    InfoScreen:
+        name: 'info'
+    
+    MapScreen:
+        name: 'map'
+    
+    ProfileScreen:
+        name: 'profile'
+
+# ==================== 登录界面 ====================
+<LoginScreen>:
+    name: 'login'
+    username: username
+    password: password
+    remember_me: remember_me
+
+    FloatLayout:
+        canvas.before:
+            Color:
+                rgb: 0.66, 0, 0  # THEME_COLOR
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        # Logo区域
+        Image:
+            source: 'logo.png' if os.path.exists('logo.png') else ''
+            size_hint: None, None
+            size: 120, 120
+            pos_hint: {'center_x': 0.5, 'y': 0.55}
+            allow_stretch: True
+            keep_ratio: True
+
+        # 欢迎文字
+        Label:
+            text: '榆林学院智慧校园'
+            font_size: '28sp'
+            bold: True
+            color: 1, 1, 1, 1
+            pos_hint: {'center_x': 0.5, 'y': 0.42}
+
+        # 登录卡片
+        BoxLayout:
+            pos_hint: {'center_x': 0.5, 'y': 0.1}
+            size_hint: 0.85, 0.45
+            padding: 20
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15]
+
+            GridLayout:
+                cols: 1
+                spacing: 15
+                padding: 10
+
+                # 用户名输入
+                TextInput:
+                    id: username
+                    hint_text: '请输入学号/用户名'
+                    size_hint_y: None
+                    height: 50
+                    multiline: False
+                    padding: [15, 0]
+                    background_color: 0.96, 0.96, 0.96, 1
+                    foreground_color: 0.2, 0.2, 0.2, 1
+
+                # 密码输入
+                TextInput:
+                    id: password
+                    hint_text: '请输入密码'
+                    size_hint_y: None
+                    height: 50
+                    multiline: False
+                    padding: [15, 0]
+                    password: True
+                    background_color: 0.96, 0.96, 0.96, 1
+                    foreground_color: 0.2, 0.2, 0.2, 1
+
+                # 记住我
+                CheckBox:
+                    id: remember_me
+                    size_hint_x: None
+                    width: 30
+                    color: 0.66, 0, 0, 1
+
+                Label:
+                    text: '记住我'
+                    size_hint_x: None
+                    width: 80
+                    color: 0.5, 0.5, 0.5, 1
+                    pos_hint: {'x': 0.1}
+
+                # 错误信息
+                Label:
+                    id: error_msg
+                    text: root.error_msg
+                    color: 1, 0.3, 0.3, 1
+                    size_hint_y: None
+                    height: 30
+                    markup: True
+
+                # 登录按钮
+                Button:
+                    text: '登 录'
+                    size_hint_y: None
+                    height: 50
+                    background_color: 0.66, 0, 0, 1
+                    color: 1, 1, 1, 1
+                    bold: True
+                    font_size: '18sp'
+                    on_press: root.on_login()
+                    background_normal: ''
+                    background_down: ''
+
+
+# ==================== 主界面 ====================
+<MainScreen>:
+    name: 'main'
+    username: username
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        # 顶部标题栏
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            padding: 15
+            canvas:
+                Color:
+                    rgb: 0.66, 0, 0
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: '榆林学院智慧校园'
+                font_size: '22sp'
+                bold: True
+                color: 1, 1, 1, 1
+
+            Button:
+                text: root.username
+                size_hint_x: None
+                width: 80
+                background_color: 0, 0, 0, 0
+                color: 1, 1, 1, 1
+
+        # 导航标签
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            padding: 5
+            spacing: 5
+            canvas:
+                Color:
+                    rgb: 0.96, 0.96, 0.96
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: '首页'
+                size_hint_x: 1
+                background_color: 0.66, 0, 0, 1
+                color: 1, 1, 1, 1
+                on_press: root.manager.current = 'home'
+
+            Button:
+                text: '课表'
+                size_hint_x: 1
+                background_color: 0.8, 0.8, 0.8, 1
+                color: 0.3, 0.3, 0.3, 1
+                on_press: root.manager.current = 'schedule'
+
+            Button:
+                text: '资讯'
+                size_hint_x: 1
+                background_color: 0.8, 0.8, 0.8, 1
+                color: 0.3, 0.3, 0.3, 1
+                on_press: root.manager.current = 'info'
+
+            Button:
+                text: '地图'
+                size_hint_x: 1
+                background_color: 0.8, 0.8, 0.8, 1
+                color: 0.3, 0.3, 0.3, 1
+                on_press: root.manager.current = 'map'
+
+            Button:
+                text: '我的'
+                size_hint_x: 1
+                background_color: 0.8, 0.8, 0.8, 1
+                color: 0.3, 0.3, 0.3, 1
+                on_press: root.manager.current = 'profile'
+
+        # 内容区域（屏幕管理器）
+        ScreenManager:
+            id: sm
+            transition: FadeTransition()
+
+            MainScreen:
+                name: 'main'
+            ScheduleScreen:
+                name: 'schedule'
+            InfoScreen:
+                name: 'info'
+            MapScreen:
+                name: 'map'
+            ProfileScreen:
+                name: 'profile'
+
+
+# ==================== 首页 ====================
+<MainScreen>:
+    name: 'main'
+
+    ScrollView:
+        do_scroll_x: False
+
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 15
+            spacing: 15
+            size_hint_y: None
+            height: self.minimum_height
+
+            # 欢迎卡片
+            BoxLayout:
+                size_hint_y: None
+                height: 80
+                canvas:
+                    Color:
+                        rgb: 0.66, 0, 0
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [10]
+
+                Label:
+                    text: '欢迎回来！'
+                    font_size: '24sp'
+                    bold: True
+                    color: 1, 1, 1, 1
+
+            # 今日课程
+            BoxLayout:
+                padding: 15
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [10]
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 10
+
+                    Label:
+                        text: '今日课程'
+                        font_size: '18sp'
+                        bold: True
+                        color: 0.66, 0, 0, 1
+                        size_hint_y: None
+                        height: 30
+
+                    Label:
+                        id: today_courses
+                        text: '暂无课程'
+                        color: 0.4, 0.4, 0.4, 1
+
+            # 快捷功能
+            BoxLayout:
+                padding: 15
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [10]
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 10
+
+                    Label:
+                        text: '快捷功能'
+                        font_size: '18sp'
+                        bold: True
+                        color: 0.66, 0, 0, 1
+                        size_hint_y: None
+                        height: 30
+
+                    GridLayout:
+                        cols: 3
+                        spacing: 10
+
+                        Button:
+                            text: '查课表'
+                            size_hint_y: None
+                            height: 60
+                            background_color: 0.66, 0, 0, 0.1
+                            color: 0.66, 0, 0, 1
+                            on_press: root.manager.current = 'schedule'
+
+                        Button:
+                            text: '看资讯'
+                            size_hint_y: None
+                            height: 60
+                            background_color: 0.66, 0, 0, 0.1
+                            color: 0.66, 0, 0, 1
+                            on_press: root.manager.current = 'info'
+
+                        Button:
+                            text: '校园地图'
+                            size_hint_y: None
+                            height: 60
+                            background_color: 0.66, 0, 0, 0.1
+                            color: 0.66, 0, 0, 1
+                            on_press: root.manager.current = 'map'
+
+            # 最新通知
+            BoxLayout:
+                padding: 15
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [10]
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 10
+
+                    Label:
+                        text: '最新通知'
+                        font_size: '18sp'
+                        bold: True
+                        color: 0.66, 0, 0, 1
+                        size_hint_y: None
+                        height: 30
+
+                    Label:
+                        id: latest_notice
+                        text: '暂无通知'
+                        color: 0.4, 0.4, 0.4, 1
+
+
+# ==================== 课表界面 ====================
+<ScheduleScreen>:
+    name: 'schedule'
+    course_list: course_list
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        # 顶部标题
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            padding: 15
+            canvas:
+                Color:
+                    rgb: 0.66, 0, 0
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: '我的课表'
+                font_size: '22sp'
+                bold: True
+                color: 1, 1, 1, 1
+
+            Button:
+                text: '+ 添加'
+                size_hint_x: None
+                width: 80
+                background_color: 0, 0, 0, 0
+                color: 1, 1, 1, 1
+                on_press: root.show_add_course_popup()
+
+        # 课表列表
+        RecycleView:
+            id: course_list
+            viewclass: 'CourseListItem'
+            do_scroll_x: False
+
+            RecycleBoxLayout:
+                orientation: 'vertical'
+                spacing: 10
+                padding: 15
+                size_hint_y: None
+                height: self.minimum_height
+                default_size_hint: 1, None
+                default_size_y: 80
+
+
+<CourseListItem>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: 80
+    padding: 10
+
+    canvas:
+        Color:
+            rgb: 0.96, 0.96, 0.96
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [8]
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 5
+
+        Label:
+            text: root.course_name
+            font_size: '16sp'
+            bold: True
+            color: 0.2, 0.2, 0.2, 1
+
+        Label:
+            text: f"{root.teacher} | {root.location}"
+            font_size: '12sp'
+            color: 0.5, 0.5, 0.5, 1
+
+        Label:
+            text: f"{root.time} | 周{root.day_of_week}"
+            font_size: '11sp'
+            color: 0.66, 0, 0, 1
+
+
+# ==================== 信息中心 ====================
+<InfoScreen>:
+    name: 'info'
+    news_list: news_list
+    contest_list: contest_list
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        # 顶部标题
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            padding: 15
+            canvas:
+                Color:
+                    rgb: 0.66, 0, 0
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: '资讯中心'
+                font_size: '22sp'
+                bold: True
+                color: 1, 1, 1, 1
+
+            Button:
+                text: '刷新'
+                size_hint_x: None
+                width: 60
+                background_color: 0, 0, 0, 0
+                color: 1, 1, 1, 1
+                on_press: root.refresh_news()
+
+        # Tab切换
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            padding: 5
+            spacing: 5
+
+            Button:
+                text: '新闻'
+                size_hint_x: 1
+                background_color: 0.66, 0, 0, 1
+                color: 1, 1, 1, 1
+
+            Button:
+                text: '竞赛'
+                size_hint_x: 1
+                background_color: 0.9, 0.9, 0.9, 1
+                color: 0.3, 0.3, 0.3, 1
+                on_press: root.show_contests()
+
+        # 新闻列表
+        RecycleView:
+            id: news_list
+            viewclass: 'NewsListItem'
+            do_scroll_x: False
+
+            RecycleBoxLayout:
+                orientation: 'vertical'
+                spacing: 8
+                padding: 15
+                size_hint_y: None
+                height: self.minimum_height
+                default_size_hint: 1, None
+                default_size_y: 70
+
+
+<NewsListItem>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: 70
+    padding: 10
+
+    canvas:
+        Color:
+            rgb: 0.96, 0.96, 0.96
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [8]
+
+    Label:
+        text: root.title
+        font_size: '14sp'
+        color: 0.2, 0.2, 0.2, 1
+        text_size: self.width, None
+        shorten: True
+        max_lines: 2
+
+    Label:
+        text: root.date
+        font_size: '11sp'
+        color: 0.6, 0.6, 0.6, 1
+
+
+# ==================== 地图界面 ====================
+<MapScreen>:
+    name: 'map'
+    current_location: current_location
+    destination: destination
+    route_info: route_info
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        # 顶部标题
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            padding: 15
+            canvas:
+                Color:
+                    rgb: 0.66, 0, 0
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: '校园地图'
+                font_size: '22sp'
+                bold: True
+                color: 1, 1, 1, 1
+
+            Button:
+                text: '定位'
+                size_hint_x: None
+                width: 60
+                background_color: 0, 0, 0, 0
+                color: 1, 1, 1, 1
+                on_press: root.update_location()
+
+        # 地图显示区域（模拟）
+        BoxLayout:
+            size_hint_y: 0.5
+            canvas:
+                Color:
+                    rgb: 0.9, 0.95, 0.9
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+        # 位置信息
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            padding: 15
+            margin: 15
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [10]
+
+            Label:
+                font_size: '14sp'
+                color: 0.3, 0.3, 0.3, 1
+
+        # 导航输入
+        BoxLayout:
+            size_hint_y: None
+            height: 120
+            padding: 15
+            margin: 15
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [10]
+
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: 10
+
+                TextInput:
+                    id: destination
+                    hint_text: '请输入目的地（如：教学楼A、图书馆）'
+                    size_hint_y: None
+                    height: 45
+                    multiline: False
+
+                Button:
+                    text: '规划路线'
+                    size_hint_y: None
+                    height: 40
+                    background_color: 0.66, 0, 0, 1
+                    color: 1, 1, 1, 1
+                    on_press: root.plan_route()
+
+        # 路线信息
+        BoxLayout:
+            size_hint_y: None
+            height: 100
+            padding: 15
+            margin: 15
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [10]
+
+            Label:
+                id: route_info
+                text: root.route_info
+                font_size: '14sp'
+                color: 0.3, 0.3, 0.3, 1
+                text_size: self.width, None
+                markup: True
+
+
+# ==================== 个人中心 ====================
+<ProfileScreen>:
+    name: 'profile'
+    username: username
+    notification_enabled: notification_enabled
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        # 顶部标题
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            padding: 15
+            canvas:
+                Color:
+                    rgb: 0.66, 0, 0
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: '个人中心'
+                font_size: '22sp'
+                bold: True
+                color: 1, 1, 1, 1
+
+        ScrollView:
+            do_scroll_x: False
+
+            BoxLayout:
+                orientation: 'vertical'
+                padding: 15
+                spacing: 15
+                size_hint_y: None
+                height: self.minimum_height
+
+                # 用户信息卡片
+                BoxLayout:
+                    size_hint_y: None
+                    height: 100
+                    padding: 20
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [10]
+
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        spacing: 15
+
+                        BoxLayout:
+                            size_hint: None, None
+                            size: 60, 60
+                            canvas:
+                                Color:
+                                    rgb: 0.66, 0, 0
+                                Ellipse:
+                                    pos: self.pos
+                                    size: self.size
+
+                            Label:
+                                text: root.username[:1].upper()
+                                font_size: '24sp'
+                                bold: True
+                                color: 1, 1, 1, 1
+
+                        BoxLayout:
+                            orientation: 'vertical'
+                            spacing: 5
+
+                            Label:
+                                text: root.username
+                                font_size: '18sp'
+                                bold: True
+                                color: 0.2, 0.2, 0.2, 1
+
+                            Label:
+                                text: '学生用户'
+                                font_size: '14sp'
+                                color: 0.5, 0.5, 0.5, 1
+
+                # 设置卡片
+                BoxLayout:
+                    size_hint_y: None
+                    height: 150
+                    padding: 15
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [10]
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: 15
+
+                        Label:
+                            text: '设置'
+                            font_size: '16sp'
+                            bold: True
+                            color: 0.66, 0, 0, 1
+                            size_hint_y: None
+                            height: 30
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_y: None
+                            height: 40
+
+                            Label:
+                                text: '课程提醒'
+                                color: 0.3, 0.3, 0.3, 1
+
+                            Switch:
+                                id: notification_switch
+                                active: root.notification_enabled
+                                color: 0.66, 0, 0, 1
+                                on_active: root.on_switch_notification(self, self.active)
+
+                # 退出按钮
+                Button:
+                    text: '退出登录'
+                    size_hint_y: None
+                    height: 50
+                    background_color: 0.8, 0.2, 0.2, 1
+                    color: 1, 1, 1, 1
+                    bold: True
+                    on_press: root.logout()
+
+
+# ==================== 通用组件 ====================
+<Card@BoxLayout>:
+    elevation: 0
+    radius: [0]
+    padding: 0
+    margin: 0
+    canvas:
+        Color:
+            rgb: 1, 1, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: root.radius

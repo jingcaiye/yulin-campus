@@ -17,12 +17,13 @@ jobs:
       with:
         python-version: '3.9'
     
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-pip build-essential git python3-dev autoconf libtool pkg-config zlib1g-dev libncurses5-dev libreadline-dev libssl-dev libffi-dev libsqlite3-dev libbz2-dev
-        pip install buildozer==1.5.0 kivy==2.3.0 cython
-        yes | sdkmanager --licenses
+        sudo apt-get install -y openjdk-17-jdk
+        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+        echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
     
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
@@ -31,8 +32,17 @@ jobs:
         build-tools: "33.0.2"
         accept-licenses: true
     
+    - name: Install Python dependencies
+      run: |
+        pip install buildozer==1.5.0 kivy==2.3.0 cython
+    
     - name: Build debug APK
       run: |
+        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        export ANDROID_HOME=/opt/android-sdk
+        export ANDROID_SDK_ROOT=/opt/android-sdk
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+        yes | sdkmanager --licenses || true
         buildozer android debug
         
     - name: Upload APK

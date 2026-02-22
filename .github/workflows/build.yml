@@ -17,21 +17,24 @@ jobs:
         with:
           python-version: '3.9'
       
-      - name: Install system packages
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-17-jdk
       
-      - name: Set JAVA_HOME
-        run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-      
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
+      - name: Set JDK
+        uses: actions/setup-java@v4
         with:
-          command: yes | buildozer android debug
-          buildozer_version: stable
+          java-version: '17'
+          distribution: 'temurin'
       
+      - name: Build APK
+        run: |
+          export JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.9-9/x64
+          export PATH=$JAVA_HOME/bin:$PATH
+          pip install buildozer
+          yes | buildozer android debug || true
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         if: success()

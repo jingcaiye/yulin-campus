@@ -25,12 +25,9 @@ jobs:
       - name: Set JAVA_HOME
         run: |
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          export PATH=$JAVA_HOME/bin:$PATH
-          java -version
       
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1.6.1
+        uses: ArtemSBulgakov/buildozer-action@v1
         with:
           command: yes | buildozer android debug
           buildozer_version: stable

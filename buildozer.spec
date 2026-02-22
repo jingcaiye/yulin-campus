@@ -8,7 +8,7 @@ email = support@yulincampus.com
 license = MIT
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
-requirements = python3,kivy==2.3.0,requests,beautifulsoup4,plyer,networkx,pillow,python-dateutil
+requirements = python3,kivy==2.3.0,requests,beautifulsoup4,plyer,networkx,pillow,python-dateutil,cython
 orientation = portrait
 
 [android]

@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: '3.9'
       
-      - name: Install dependencies
+      - name: Install system packages
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-17-jdk
@@ -30,7 +30,7 @@ jobs:
           java -version
       
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
+        uses: ArtemSBulgakov/buildozer-action@v1.6.1
         with:
           command: yes | buildozer android debug
           buildozer_version: stable

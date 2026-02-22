@@ -16,7 +16,6 @@ permissions = INTERNET,ACCESS_NETWORK_STATE,ACCESS_FINE_LOCATION,ACCESS_COARSE_L
 api = 27
 minapi = 21
 accept_sdk_license = True
-android_sdk_build_tools = 33.0.2
 presplash_color = #A80000
 icon.filename = icon.png
 densities = 160, 240, 320, 480, 640

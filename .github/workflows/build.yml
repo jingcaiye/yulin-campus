@@ -21,20 +21,15 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y python3-pip build-essential git python3-dev autoconf libtool pkg-config zlib1g-dev libncurses5-dev libreadline-dev libssl-dev libffi-dev libsqlite3-dev libbz2-dev
-        pip install buildozer==1.5.0
-        pip install kivy==2.3.0 cython
+        pip install buildozer==1.5.0 kivy==2.3.0 cython
+        yes | sdkmanager --licenses
     
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       with:
         api-levels: "27"
-        build-tools: "37.0.0"
+        build-tools: "33.0.2"
         accept-licenses: true
-    
-    - name: Accept Android SDK licenses
-      run: |
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-        yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
     
     - name: Build debug APK
       run: |
